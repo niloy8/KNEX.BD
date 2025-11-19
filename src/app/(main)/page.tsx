@@ -11,14 +11,14 @@ export default function HomePage() {
     ];
 
     const categories = [
-        { name: "Mobiles & Tablets", icon: "📱", href: "/category/mobiles" },
-        { name: "Fashion", icon: "👗", href: "/category/fashion" },
-        { name: "Electronics", icon: "💻", href: "/category/electronics" },
-        { name: "Home & Furniture", icon: "🛋️", href: "/category/home" },
-        { name: "TVs & Appliances", icon: "📺", href: "/category/appliances" },
-        { name: "Beauty & Food", icon: "💄", href: "/category/beauty" },
-        { name: "Flight Bookings", icon: "✈️", href: "/flights", badge: "NEW" },
-        { name: "Grocery", icon: "🛒", href: "/category/grocery" },
+        { name: "Fashion", icon: "https://knex.com.bd/wp-content/uploads/2025/11/Faison-removebg-preview.png", href: "/category/mobiles" },
+        { name: "Beauty", icon: "https://knex.com.bd/wp-content/uploads/2025/11/Beauty-2-1-removebg-preview-1.png", href: "/category/fashion" },
+        { name: "Mobiles", icon: "https://knex.com.bd/wp-content/uploads/2025/11/mobiles-2-removebg-preview.png", href: "/category/electronics" },
+        { name: "Smart Gadget", icon: "https://knex.com.bd/wp-content/uploads/2025/11/smart-gadget-removebg-preview.png", href: "/category/home" },
+        { name: "Electronics", icon: "https://knex.com.bd/wp-content/uploads/2025/11/Home-2-removebg-preview.png", href: "/category/appliances" },
+        { name: "Home & Furniture", icon: "https://knex.com.bd/wp-content/uploads/2025/11/Electronicss-removebg-preview.png", href: "/category/beauty" },
+        { name: "Stone", icon: "https://knex.com.bd/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-02_17_01-PM-removebg-preview.png", href: "/flights", badge: "NEW" },
+
     ]; const fashionDeals = [
         { title: "Sports Shoes", price: "Min. 70% Off", image: "👟", href: "/deals/shoes" },
         { title: "Slippers", price: "Min. 70% Off", image: "🩴", href: "/deals/slippers" },
@@ -44,8 +44,8 @@ export default function HomePage() {
         <div className="min-h-screen bg-gray-50">
             {/* Categories */}
             <section className="bg-white shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 py-6">
-                    <div className="grid grid-cols-4 sm:grid-cols-8 gap-4">
+                <div className="max-w-7xl mx-auto px-2 sm:px-4 py-6">
+                    <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-7 gap-3 sm:gap-4">
                         {categories.map((category) => (
                             <CategoryCard key={category.name} {...category} />
                         ))}
