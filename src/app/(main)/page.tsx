@@ -5,9 +5,9 @@ import SectionHeader from "@/components/SectionHeader";
 
 export default function HomePage() {
     const banners = [
-        { title: "Office Chairs", subtitle: "Green Soul, Cell Bell & more", price: "From ₹2,999", bgColor: "bg-gradient-to-r from-blue-600 to-indigo-600", image: "🪑" },
-        { title: "Gaming Laptops", subtitle: "ASUS, MSI & more", price: "From ₹49,999", bgColor: "bg-gradient-to-r from-purple-600 to-pink-600", image: "💻" },
-        { title: "Smart Watches", subtitle: "Apple, Samsung & more", price: "From ₹1,999", bgColor: "bg-gradient-to-r from-green-600 to-teal-600", image: "⌚" },
+        { title: "Office Chairs", subtitle: "Green Soul, Cell Bell & more", price: "From Tk 2,999", bgColor: "bg-gradient-to-r from-blue-600 to-indigo-600", image: "🪑" },
+        { title: "Gaming Laptops", subtitle: "ASUS, MSI & more", price: "From Tk 49,999", bgColor: "bg-gradient-to-r from-purple-600 to-pink-600", image: "💻" },
+        { title: "Smart Watches", subtitle: "Apple, Samsung & more", price: "From Tk 1,999", bgColor: "bg-gradient-to-r from-green-600 to-teal-600", image: "⌚" },
     ];
 
     const categories = [
@@ -20,24 +20,24 @@ export default function HomePage() {
         { name: "Stone", icon: "https://knex.com.bd/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-02_17_01-PM-removebg-preview.png", href: "/flights", badge: "NEW" },
 
     ]; const fashionDeals = [
-        { title: "Sports Shoes", price: "Min. 70% Off", image: "👟", href: "/deals/shoes" },
-        { title: "Slippers", price: "Min. 70% Off", image: "🩴", href: "/deals/slippers" },
-        { title: "Smart Watch", price: "From ₹999", image: "⌚", href: "/deals/watches" },
-        { title: "Backpacks", price: "Min. 60% Off", image: "🎒", href: "/deals/bags" },
+        { title: "Sports Shoes", price: "Min. 70% Off", image: "👟", href: "/products?category=sports-shoes" },
+        { title: "Slippers", price: "Min. 70% Off", image: "🩴", href: "/products?category=slippers" },
+        { title: "Smart Watch", price: "From Tk 999", image: "⌚", href: "/products?category=smart-watch" },
+        { title: "Backpacks", price: "Min. 60% Off", image: "🎒", href: "/products?category=backpacks" },
     ];
 
     const topDeals = [
-        { title: "Projectors", price: "From ₹6990", image: "📽️", href: "/product/projector" },
-        { title: "Speakers", price: "From ₹499", image: "🔊", href: "/product/speaker" },
-        { title: "Gaming Monitor", price: "From ₹6599", image: "🖥️", href: "/product/monitor" },
-        { title: "Gaming Chair", price: "From ₹8279", image: "🪑", href: "/product/chair" },
+        { title: "Projectors", price: "From Tk 6990", image: "📽️", href: "/products?category=projectors" },
+        { title: "Speakers", price: "From Tk 499", image: "🔊", href: "/products?category=speakers" },
+        { title: "Gaming Monitor", price: "From Tk 6599", image: "🖥️", href: "/products?category=gaming-monitor" },
+        { title: "Gaming Chair", price: "From Tk 8279", image: "🪑", href: "/products?category=gaming-chair" },
     ];
 
     const saleDeals = [
-        { title: "Winter Accessories", price: "Min. 50% Off", image: "🧤", href: "/sale/winter" },
-        { title: "Dry Fruits", price: "Min. 50% Off", image: "🥜", href: "/sale/dryfruits" },
-        { title: "Baby Care", price: "Up to 40% Off", image: "🍼", href: "/sale/babycare" },
-        { title: "Bike Lights", price: "From ₹299", image: "💡", href: "/sale/lights" },
+        { title: "Winter Accessories", price: "Min. 50% Off", image: "🧤", href: "/products?category=winter" },
+        { title: "Dry Fruits", price: "Min. 50% Off", image: "🥜", href: "/products?category=dry-fruits" },
+        { title: "Baby Care", price: "Up to 40% Off", image: "🍼", href: "/products?category=baby-care" },
+        { title: "Bike Lights", price: "From Tk 299", image: "💡", href: "/products?category=bike-lights" },
     ];
 
     return (
@@ -86,7 +86,7 @@ export default function HomePage() {
                 </section>
 
                 {/* Flight Bookings Banner */}
-                <Banner banners={[{ title: "Flight bookings", subtitle: "Lowest fares guaranteed", price: "From ₹1,499*", bgColor: "bg-gradient-to-r from-orange-500 to-yellow-500", image: "✈️" }]} autoSlide={false} />
+                <Banner banners={[{ title: "Flight bookings", subtitle: "Lowest fares guaranteed", price: "From Tk 1,499*", bgColor: "bg-gradient-to-r from-orange-500 to-yellow-500", image: "✈️" }]} autoSlide={false} />
 
 
             </div>

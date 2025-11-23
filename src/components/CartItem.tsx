@@ -32,7 +32,7 @@ export default function CartItem({
                 <div className="flex-1 min-w-0">
                     <p className="text-xs text-gray-500 uppercase mb-1">Shirt</p>
                     <h4 className="font-medium text-sm sm:text-base text-gray-900 truncate">{title}</h4>
-                    <p className="text-xs sm:hidden text-gray-600 mt-1">৳{price.toLocaleString()} each</p>
+                    <p className="text-xs sm:hidden text-gray-600 mt-1">Tk {price.toLocaleString()} each</p>
                 </div>
             </div>
 
@@ -57,7 +57,7 @@ export default function CartItem({
                 </div>
 
                 {/* Price */}
-                <p className="font-semibold text-gray-900 text-sm sm:text-base w-20 sm:w-24 text-right">৳ {(price * quantity).toLocaleString()}</p>
+                <p className="font-semibold text-gray-900 text-sm sm:text-base w-20 sm:w-24 text-right">Tk {(price * quantity).toLocaleString()}</p>
 
                 {/* Remove Button */}
                 <button onClick={() => onRemove(id)} className="text-gray-400 hover:text-red-500 cursor-pointer p-1">
