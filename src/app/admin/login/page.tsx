@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { adminAuth } from "@/lib/adminAuth";
 import { useRouter } from "next/navigation";
 import { Lock, Mail } from "lucide-react";
+import Image from "next/image";
 
 export default function AdminLoginPage() {
     const [email, setEmail] = useState("admin@knex.bd");
@@ -32,9 +33,16 @@ export default function AdminLoginPage() {
             <div className="w-full max-w-md">
                 {/* Logo */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-2xl mb-4">
-                        <span className="text-3xl">🛒</span>
+
+                    <div className="inline-flex items-center justify-center w-20 h-20  relative">
+                        <Image
+                            src="https://knex.com.bd/wp-content/uploads/2025/07/cropped-3d-png.png"
+                            alt="KNEX Logo"
+                            fill
+                            className="object-contain"
+                        />
                     </div>
+
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">KNEX Admin</h1>
                     <p className="text-gray-600">Sign in to your admin panel</p>
                 </div>

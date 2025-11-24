@@ -51,8 +51,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div className="flex flex-col h-full">
                     {/* Logo */}
                     <div className="h-16 flex items-center justify-between px-6 border-b border-gray-100">
-                        <Link href="/admin/dashboard" className="flex items-center gap-2">
-                            <div className="relative w-8 h-8">
+                        <Link href="/admin/dashboard" className="flex items-center gap-3">
+                            <div className="relative w-12 h-12">
                                 <Image
                                     src="https://knex.com.bd/wp-content/uploads/2025/07/cropped-3d-png.png"
                                     alt="KNEX Logo"
