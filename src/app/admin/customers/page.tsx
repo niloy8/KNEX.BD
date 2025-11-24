@@ -5,7 +5,7 @@ import ProtectedAdmin from "@/components/admin/ProtectAdmin";
 import DataTable from "@/components/admin/DataTable";
 import Badge from "@/components/admin/Badge";
 import { adminData } from "@/lib/adminData";
-import { UserPlus, Mail, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 
 export default function AdminCustomers() {
     const customers = adminData.getCustomers();
@@ -14,15 +14,9 @@ export default function AdminCustomers() {
         <ProtectedAdmin>
             <div className="space-y-6">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
-                        <p className="text-sm text-gray-500 mt-1">Manage your customer database</p>
-                    </div>
-                    <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                        <UserPlus className="w-4 h-4" />
-                        Add Customer
-                    </button>
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
+                    <p className="text-sm text-gray-500 mt-1">View and manage customers who have placed orders</p>
                 </div>
 
                 {/* Stats */}
