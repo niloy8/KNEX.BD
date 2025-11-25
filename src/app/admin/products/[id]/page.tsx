@@ -14,6 +14,7 @@ export default function AdminEditProduct() {
     const params = useParams();
     const router = useRouter();
     const id = params.id as string;
+    const [mounted, setMounted] = useState(false);
     const [product, setProduct] = useState<any>(null);
     const [saving, setSaving] = useState(false);
     const [mainImage, setMainImage] = useState<string>("");
@@ -31,6 +32,12 @@ export default function AdminEditProduct() {
     const [variants, setVariants] = useState<{ name: string; values: string[]; prices?: { [key: string]: number } }[]>([]);
 
     useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!mounted) return;
+
         const p = adminData.getProduct(id);
         if (p) {
             setProduct(p);
@@ -61,7 +68,7 @@ export default function AdminEditProduct() {
                 sku: "",
             });
         }
-    }, [id]);
+    }, [id, mounted]);
 
     const handleSave = async () => {
         setSaving(true);
@@ -91,7 +98,7 @@ export default function AdminEditProduct() {
         router.push("/admin/products");
     };
 
-    if (!product) return <div>Loading...</div>;
+    if (!mounted || !product) return null;
 
     return (
         <ProtectedAdmin>
@@ -360,11 +367,11 @@ export default function AdminEditProduct() {
                                         <p className="text-xs text-gray-500 mb-3">Add different product variations with images (e.g., different strap colors for watches)</p>
                                         <div className="space-y-3">
                                             {imageSwatch.length > 0 && (
-                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3" suppressHydrationWarning>
                                                     {imageSwatch.map((swatch, idx) => (
                                                         <div key={idx} className="relative border-2 border-gray-200 rounded-lg p-2 group">
                                                             <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-100 mb-2">
-                                                                <Image src={swatch.image} alt={swatch.name} fill className="object-cover" />
+                                                                <Image src={swatch.image} alt={swatch.name} fill className="object-cover" unoptimized />
                                                             </div>
                                                             <p className="text-xs font-medium text-center truncate">{swatch.name}</p>
                                                             <button
@@ -445,12 +452,22 @@ export default function AdminEditProduct() {
                                                         }
                                                     }}
                                                     className={`px-4 py-2 rounded-lg border-2 transition-colors ${sizes.includes(size)
-                                                            ? "border-blue-600 bg-blue-50 text-blue-700"
-                                                            : "border-gray-200 hover:border-gray-300"
+                                                        ? "border-blue-600 bg-blue-50 text-blue-700"
+                                                        : "border-gray-200 hover:border-gray-300"
                                                         }`}
                                                 >
                                                     {size}
                                                 </button>
+                                            ))}
+                                            {/* Show custom sizes */}
+                                            {sizes.filter(s => !["S", "M", "L", "XL", "XXL"].includes(s)).map((size, idx) => (
+                                                <div key={idx} className="flex items-center gap-2 px-4 py-2 bg-blue-50 border-2 border-blue-600 text-blue-700 rounded-lg">
+                                                    <span>{size}</span>
+                                                    <X
+                                                        className="w-4 h-4 cursor-pointer hover:text-red-600"
+                                                        onClick={() => setSizes(sizes.filter(s => s !== size))}
+                                                    />
+                                                </div>
                                             ))}
                                         </div>
                                         <div className="flex gap-2">
@@ -614,8 +631,8 @@ export default function AdminEditProduct() {
                             </label>
                             <div className="flex items-center gap-4">
                                 {mainImage && (
-                                    <div className="relative w-24 h-24 border border-gray-200 rounded-lg overflow-hidden">
-                                        <Image src={mainImage} alt="Main" fill className="object-cover" />
+                                    <div className="relative w-24 h-24 border border-gray-200 rounded-lg overflow-hidden" suppressHydrationWarning>
+                                        <Image src={mainImage} alt="Main" fill className="object-cover" unoptimized />
                                     </div>
                                 )}
                                 <div className="flex-1 flex gap-2">
@@ -648,10 +665,10 @@ export default function AdminEditProduct() {
                             </label>
                             <div className="space-y-3">
                                 {gallery.length > 0 && (
-                                    <div className="flex flex-wrap gap-3">
+                                    <div className="flex flex-wrap gap-3" suppressHydrationWarning>
                                         {gallery.map((img, idx) => (
                                             <div key={idx} className="relative w-24 h-24 border border-gray-200 rounded-lg overflow-hidden group">
-                                                <Image src={img} alt={`Gallery ${idx + 1}`} fill className="object-cover" />
+                                                <Image src={img} alt={`Gallery ${idx + 1}`} fill className="object-cover" unoptimized />
                                                 <button
                                                     onClick={() => setGallery(gallery.filter((_, i) => i !== idx))}
                                                     className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
@@ -831,19 +848,19 @@ export default function AdminEditProduct() {
                                     <div className="flex gap-4">
                                         {/* Thumbnail Strip (Vertical) */}
                                         {gallery.length > 0 && (
-                                            <div className="flex flex-col gap-2">
+                                            <div className="flex flex-col gap-2" suppressHydrationWarning>
                                                 {gallery.slice(0, 6).map((img, idx) => (
                                                     <div key={idx} className="relative w-16 h-16 bg-white rounded-lg border-2 border-gray-200 hover:border-blue-500 flex-shrink-0 overflow-hidden cursor-pointer transition-colors">
-                                                        <Image src={img} alt={`Thumbnail ${idx + 1}`} fill className="object-cover" />
+                                                        <Image src={img} alt={`Thumbnail ${idx + 1}`} fill className="object-cover" unoptimized />
                                                     </div>
                                                 ))}
                                             </div>
                                         )}
 
                                         {/* Main Image */}
-                                        <div className="relative flex-1 aspect-square bg-white rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden">
+                                        <div className="relative flex-1 aspect-square bg-white rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden" suppressHydrationWarning>
                                             {mainImage ? (
-                                                <Image src={mainImage} alt="Product" fill className="object-cover" />
+                                                <Image src={mainImage} alt="Product" fill className="object-cover" unoptimized />
                                             ) : (
                                                 <span className="text-6xl">📦</span>
                                             )}
@@ -913,14 +930,14 @@ export default function AdminEditProduct() {
                                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                                         Strap Color: {imageSwatch[0]?.name}
                                                     </label>
-                                                    <div className="flex gap-2 flex-wrap">
+                                                    <div className="flex gap-2 flex-wrap" suppressHydrationWarning>
                                                         {imageSwatch.map((swatch, idx) => (
                                                             <button
                                                                 key={idx}
                                                                 className={`relative w-16 h-16 rounded-lg border-2 ${idx === 0 ? 'border-blue-600' : 'border-gray-200'
                                                                     } overflow-hidden`}
                                                             >
-                                                                <Image src={swatch.image} alt={swatch.name} fill className="object-cover" />
+                                                                <Image src={swatch.image} alt={swatch.name} fill className="object-cover" unoptimized />
                                                                 {idx === 0 && (
                                                                     <div className="absolute inset-0 bg-blue-600/20 flex items-center justify-center">
                                                                         <span className="text-white text-xl">✓</span>
@@ -943,8 +960,8 @@ export default function AdminEditProduct() {
                                                             <button
                                                                 key={idx}
                                                                 className={`px-4 py-2 rounded-lg border-2 ${idx === 0
-                                                                        ? 'border-blue-600 bg-blue-50 text-blue-700'
-                                                                        : 'border-gray-200 hover:border-gray-300'
+                                                                    ? 'border-blue-600 bg-blue-50 text-blue-700'
+                                                                    : 'border-gray-200 hover:border-gray-300'
                                                                     }`}
                                                             >
                                                                 {size}
@@ -965,8 +982,8 @@ export default function AdminEditProduct() {
                                                             <button
                                                                 key={idx}
                                                                 className={`px-4 py-2 rounded-lg border-2 ${idx === 0
-                                                                        ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium'
-                                                                        : 'border-gray-200 hover:border-gray-300'
+                                                                    ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium'
+                                                                    : 'border-gray-200 hover:border-gray-300'
                                                                     }`}
                                                             >
                                                                 {option}
@@ -991,8 +1008,8 @@ export default function AdminEditProduct() {
                                                             <button
                                                                 key={valIdx}
                                                                 className={`px-4 py-2 rounded-lg border-2 ${valIdx === 0
-                                                                        ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium'
-                                                                        : 'border-gray-200 hover:border-gray-300'
+                                                                    ? 'border-blue-600 bg-blue-50 text-blue-700 font-medium'
+                                                                    : 'border-gray-200 hover:border-gray-300'
                                                                     }`}
                                                             >
                                                                 {val}
