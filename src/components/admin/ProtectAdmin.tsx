@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { adminAuth } from "@/lib/adminAuth";
 
@@ -10,14 +10,20 @@ interface ProtectedAdminProps {
 
 export default function ProtectedAdmin({ children }: ProtectedAdminProps) {
     const router = useRouter();
+    const [isAuth, setIsAuth] = useState(false);
 
     useEffect(() => {
-        if (!adminAuth.isAuthenticated()) {
-            router.replace("/admin/login");
-        }
+        const checkAuth = () => {
+            if (!adminAuth.isAuthenticated()) {
+                router.replace("/admin/login");
+            } else {
+                setIsAuth(true);
+            }
+        };
+        checkAuth();
     }, [router]);
 
-    if (!adminAuth.isAuthenticated()) {
+    if (!isAuth) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

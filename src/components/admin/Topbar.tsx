@@ -2,7 +2,6 @@
 
 import React from "react";
 import { adminAuth } from "@/lib/adminAuth";
-import { useRouter } from "next/navigation";
 import { Menu, Search, Bell, ChevronDown } from "lucide-react";
 import Link from "next/link";
 
@@ -11,12 +10,11 @@ interface TopbarProps {
 }
 
 export default function Topbar({ onMenuClick }: TopbarProps) {
-    const router = useRouter();
     const user = adminAuth.getCurrentUser();
 
     function handleLogout() {
         adminAuth.logout();
-        router.push("/admin/login");
+        window.location.href = "/admin/login";
     }
 
     return (

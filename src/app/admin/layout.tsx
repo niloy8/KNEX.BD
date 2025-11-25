@@ -1,11 +1,16 @@
+"use client";
+
 import React from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-
-export const metadata = {
-    title: "KNEX Admin Panel",
-    description: "E-commerce admin dashboard",
-};
+import { usePathname } from "next/navigation";
 
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname();
+    const isLoginPage = pathname === "/admin/login";
+
+    if (isLoginPage) {
+        return <>{children}</>;
+    }
+
     return <AdminLayout>{children}</AdminLayout>;
 }
