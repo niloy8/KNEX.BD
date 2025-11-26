@@ -1,4 +1,4 @@
-import { Eye } from "lucide-react";
+import { Eye, Heart } from "lucide-react";
 import Image from "next/image";
 
 interface Product {
@@ -55,8 +55,8 @@ export default function ProductPreview({ product, mainImage, gallery, productTyp
                             )}
                             <div className="relative flex-1 aspect-square bg-white rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden" suppressHydrationWarning>
                                 {mainImage ? <Image src={mainImage} alt="Product" fill className="object-cover" unoptimized /> : <span className="text-6xl">📦</span>}
-                                <button className="absolute top-4 right-4 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center">
-                                    <span className="text-xl">🤍</span>
+                                <button className="absolute top-4 right-4 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all group">
+                                    <Heart className="w-5 h-5 text-gray-400 group-hover:text-red-500 group-hover:fill-red-500 transition-all" />
                                 </button>
                             </div>
                         </div>

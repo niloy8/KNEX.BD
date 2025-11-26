@@ -45,10 +45,31 @@
 }
 
 .ProseMirror img {
-    max-width: 100%;
+    max-width: 300px;
     height: auto;
     border-radius: 0.5rem;
-    margin: 1rem 0;
+    margin: 0.5rem 0;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.ProseMirror img:hover {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+.ProseMirror img.ProseMirror-selectednode {
+    outline: 3px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Image resize handles */
+.ProseMirror .resize-cursor {
+    cursor: nwse-resize;
+}
+
+.ProseMirror img[data-drag-handle] {
+    cursor: move;
 }
 
 .ProseMirror a {
