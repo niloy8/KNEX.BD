@@ -63,8 +63,8 @@ export default function AdminEditProduct() {
                 setProduct({
                     id: "",
                     title: "",
-                    price: 0,
-                    originalPrice: 0,
+                    price: null,
+                    originalPrice: null,
                     category: "",
                     brand: "",
                     features: [],
