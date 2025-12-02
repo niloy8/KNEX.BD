@@ -8,14 +8,10 @@ export default function MainLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body
-            >
-                <Header></Header>
-
-                {children}
-                <Footer></Footer>
-            </body>
-        </html>
+        <>
+            <Header></Header>
+            {children}
+            <Footer></Footer>
+        </>
     );
 }

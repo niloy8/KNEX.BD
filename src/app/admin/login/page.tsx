@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { adminAuth } from "@/lib/adminAuth";
+import { signInWithEmail, isAdmin } from "@/lib/authHelper";
 import { useRouter } from "next/navigation";
 import { Lock, Mail } from "lucide-react";
 import Image from "next/image";
@@ -19,7 +19,13 @@ export default function AdminLoginPage() {
         setError(null);
 
         try {
-            await adminAuth.login(email, password);
+            const user = await signInWithEmail(email, password);
+            if (!isAdmin(user)) {
+                const { logout } = await import("@/lib/authHelper");
+                await logout();
+                setError("Access denied. Admin privileges required.");
+                return;
+            }
             router.push("/admin/dashboard");
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "Login failed");

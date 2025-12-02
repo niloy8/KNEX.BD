@@ -67,7 +67,7 @@ export default function WishlistPage() {
 
             <CategoryNav></CategoryNav>
 
-            <div className="max-w-7xl mx-auto px-4 mt-2.5">
+            <div className="max-w-7xl mx-auto px-4 mt-2.5 mb-2.5">
                 {/* Header with Heart Icon */}
                 <div className="flex flex-col items-center mb-3">
                     <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 via-blue-400 to-green-500 rounded-full flex items-center justify-center mb-4 shadow-lg">

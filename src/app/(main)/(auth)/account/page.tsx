@@ -1,31 +1,41 @@
 "use client";
 
-import React, { useState } from "react";
-import { userAuth, User as UserType } from "@/lib/userAuth";
-import { User, Mail, Phone, Package, Heart, MapPin, LogOut } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { User, Mail, Package, Heart, MapPin, LogOut } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { onAuthChange, logout, type AuthUser } from "@/lib/authHelper";
 
 export default function AccountPage() {
-    const [isLoggedIn, setIsLoggedIn] = useState(() => {
-        if (typeof window !== "undefined") {
-            return userAuth.isAuthenticated();
-        }
-        return false;
-    });
-    const [user, setUser] = useState<UserType | null>(() => {
-        if (typeof window !== "undefined") {
-            return userAuth.getCurrentUser();
-        }
-        return null;
-    });
+    const router = useRouter();
+    const [user, setUser] = useState<AuthUser | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const handleLogout = () => {
-        userAuth.logout();
-        setIsLoggedIn(false);
-        setUser(null);
+    useEffect(() => {
+        const unsubscribe = onAuthChange((authUser) => {
+            setUser(authUser);
+            setLoading(false);
+        });
+        return () => unsubscribe();
+    }, []);
+
+    const handleLogout = async () => {
+        await logout();
+        router.push("/login");
     };
 
-    if (isLoggedIn && user) {
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (user) {
         return (
             <div className="min-h-screen bg-gray-50 py-8">
                 <div className="max-w-6xl mx-auto px-4">
@@ -33,10 +43,10 @@ export default function AccountPage() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white text-2xl font-bold">
-                                    {user.name?.charAt(0).toUpperCase()}
+                                    {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                    <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
+                                    <h1 className="text-2xl font-bold text-gray-900">{user.displayName || "User"}</h1>
                                     <p className="text-gray-500">{user.email}</p>
                                 </div>
                             </div>
@@ -83,7 +93,7 @@ export default function AccountPage() {
                                 <User className="w-5 h-5 text-gray-600" />
                                 <div>
                                     <p className="text-sm text-gray-500">Name</p>
-                                    <p className="font-medium text-gray-900">{user.name}</p>
+                                    <p className="font-medium text-gray-900">{user.displayName || "Not set"}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
@@ -93,15 +103,6 @@ export default function AccountPage() {
                                     <p className="font-medium text-gray-900">{user.email}</p>
                                 </div>
                             </div>
-                            {user.phone && (
-                                <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                                    <Phone className="w-5 h-5 text-gray-600" />
-                                    <div>
-                                        <p className="text-sm text-gray-500">Phone</p>
-                                        <p className="font-medium text-gray-900">{user.phone}</p>
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
