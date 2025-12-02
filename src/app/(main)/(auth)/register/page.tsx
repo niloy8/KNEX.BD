@@ -14,6 +14,18 @@ export default function Register() {
             <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
                 <label className="block">
                     <div className="flex items-center gap-3 px-3 py-2 border rounded-2xl focus-within:ring-2 focus-within:ring-blue-300 transition">
+                        <UserPlus size={18} className="text-gray-500" />
+                        <input
+                            aria-label="Full-Name"
+                            type="text"
+                            placeholder="Full name"
+                            required
+                            className="w-full bg-transparent outline-none text-sm sm:text-base"
+                        />
+                    </div>
+                </label>
+                <label className="block">
+                    <div className="flex items-center gap-3 px-3 py-2 border rounded-2xl focus-within:ring-2 focus-within:ring-blue-300 transition">
                         <Mail size={18} className="text-gray-500" />
                         <input
                             aria-label="Email"

@@ -111,7 +111,7 @@ export default function AccountPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center py-12 px-4">
-            <div className="max-w-md w-full">
+            <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
                 <div className="text-center mb-8">
                     <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
                         <User className="w-10 h-10 text-white" />
@@ -120,7 +120,7 @@ export default function AccountPage() {
                     <p className="text-gray-600">Login or create an account to continue</p>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+                <div>
                     <div className="space-y-4">
                         <Link
                             href="/login"
