@@ -57,6 +57,13 @@ export default function HomePage() {
         { label: "Min. 50% Off", meta: "Top Rated • Durable", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&q=80" },
     ];
 
+    const fashionTopDealsGrid = [
+        { label: "Min. 70% Off", meta: "Trending Sneakers", image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=400&q=80" },
+        { label: "Min. 70% Off", meta: "Summer Sandals", image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&q=80" },
+        { label: "Min. 90% Off", meta: "Smart Watch Deals", image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80" },
+        { label: "Min. 70% Off", meta: "Backpacks & Bags", image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&q=80" },
+    ];
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Categories */}
@@ -73,7 +80,15 @@ export default function HomePage() {
             <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
                 {/* Hero Banner */}
                 <Banner banners={banners} autoSlide={true} interval={5000} />
-
+                {/* Top Deals */}
+                <section>
+                    <SectionHeader title="Top Deals" href="/deals" />
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {topDeals.map((deal) => (
+                            <ProductCard key={deal.title} {...deal} />
+                        ))}
+                    </div>
+                </section>
                 {/* Three-column row: two deals sections + promo */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <DealsSection title="Winter Essentials for You" items={winterEssentials} viewAllHref="/products?category=winter" />
@@ -86,25 +101,23 @@ export default function HomePage() {
                     />
                 </div>
 
-                {/* Fashion Top Deals */}
-                <section>
-                    <SectionHeader title="Fashion's Top Deals" href="/deals/fashion" />
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {fashionDeals.map((deal) => (
-                            <ProductCard key={deal.title} {...deal} />
-                        ))}
+                {/* Fashion's Top Deals + Smartphones Promo (row) */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-1">
+                        <DealsSection title="Fashion's Top Deals" items={fashionTopDealsGrid} viewAllHref="/deals/fashion" />
                     </div>
-                </section>
+                    <div className="lg:col-span-2">
+                        <FashionPromo
+                            title="Top Selling Smartphones"
+                            subtitle="Latest Technology, Best Brands"
+                            buttonText="Explore Now"
+                            href="/products?category=smartphones"
+                            image="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&q=80"
+                        />
+                    </div>
+                </div>
 
-                {/* Top Deals */}
-                <section>
-                    <SectionHeader title="Top Deals" href="/deals" />
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {topDeals.map((deal) => (
-                            <ProductCard key={deal.title} {...deal} />
-                        ))}
-                    </div>
-                </section>
+
 
                 {/* Top picks of the sale */}
                 <section>

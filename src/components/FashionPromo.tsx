@@ -5,19 +5,19 @@ interface FashionPromoProps {
     title: string;
     subtitle: string;
     buttonText: string;
-    image: string; // used as background image on the right
+    image: string;
     href?: string;
 }
 
 export default function FashionPromo({ title, subtitle, buttonText, image, href = "/products" }: FashionPromoProps) {
     return (
-        <section className="relative rounded-lg overflow-hidden shadow-sm">
+        <section className="relative w-full h-full rounded-lg overflow-hidden shadow-sm min-h-[260px] md:min-h-[320px] lg:min-h-[360px]">
             <div
-                className="absolute inset-0 bg-center bg-cover"
+                className="absolute inset-0 bg-center bg-no-repeat bg-cover"
                 style={{ backgroundImage: `url(${image})` }}
                 aria-hidden
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/70 to-white/10" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/95 via-white/70 to-white/10" />
 
             <div className="relative p-6 md:p-8 lg:p-10">
                 <div className="max-w-lg">
