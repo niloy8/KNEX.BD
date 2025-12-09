@@ -8,8 +8,11 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'knex.com.bd',
+
       },
+
     ],
+    domains: ["images.unsplash.com"]
   },
 };
 

@@ -2,6 +2,8 @@ import CategoryCard from "@/components/CategoryCard";
 import ProductCard from "@/components/ProductCard";
 import Banner from "@/components/Banner";
 import SectionHeader from "@/components/SectionHeader";
+import DealsSection from "@/components/DealsSection";
+import FashionPromo from "@/components/FashionPromo";
 
 export default function HomePage() {
     const banners = [
@@ -18,8 +20,9 @@ export default function HomePage() {
         { name: "Electronics", icon: "https://knex.com.bd/wp-content/uploads/2025/11/Home-2-removebg-preview.png", href: "/category/appliances" },
         { name: "Home & Furniture", icon: "https://knex.com.bd/wp-content/uploads/2025/11/Electronicss-removebg-preview.png", href: "/category/beauty" },
         { name: "Stone", icon: "https://knex.com.bd/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-02_17_01-PM-removebg-preview.png", href: "/flights", badge: "NEW" },
+    ];
 
-    ]; const fashionDeals = [
+    const fashionDeals = [
         { title: "Sports Shoes", price: "Min. 70% Off", image: "👟", href: "/products?category=sports-shoes" },
         { title: "Slippers", price: "Min. 70% Off", image: "🩴", href: "/products?category=slippers" },
         { title: "Smart Watch", price: "From Tk 999", image: "⌚", href: "/products?category=smart-watch" },
@@ -40,6 +43,20 @@ export default function HomePage() {
         { title: "Bike Lights", price: "From Tk 299", image: "💡", href: "/products?category=bike-lights" },
     ];
 
+    const winterEssentials = [
+        { label: "Top Sellers", image: "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=400&q=80" },
+        { label: "Most-loved", image: "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=400&q=80" },
+        { label: "Min. 50% Off", image: "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=400&q=80" },
+        { label: "Top Picks", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&q=80" },
+    ];
+
+    const topPicksSale = [
+        { label: "Min. 50% Off", image: "https://images.unsplash.com/photo-1542060748-10c28b62716f?w=400&q=80" },
+        { label: "Min. 30% Off", image: "https://images.unsplash.com/photo-1556228578-8fb722d5277a?w=400&q=80" },
+        { label: "Min. 50% Off", image: "https://images.unsplash.com/photo-1586201375761-83865001e31b?w=400&q=80" },
+        { label: "Min. 50% Off", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&q=80" },
+    ];
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Categories */}
@@ -55,7 +72,21 @@ export default function HomePage() {
 
             <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
                 {/* Hero Banner */}
-                <Banner banners={banners} autoSlide={true} interval={5000} />                {/* Fashion Top Deals */}
+                <Banner banners={banners} autoSlide={true} interval={5000} />
+
+                {/* Three-column row: two deals sections + promo */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <DealsSection title="Winter Essentials for You" items={winterEssentials} viewAllHref="/products?category=winter" />
+                    <DealsSection title="Top picks of the sale" items={topPicksSale} viewAllHref="/sale" />
+                    <FashionPromo
+                        title="Shop your fashion Needs"
+                        subtitle="with Latest & Trendy Choices"
+                        buttonText="Shop Now"
+                        image="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80"
+                    />
+                </div>
+
+                {/* Fashion Top Deals */}
                 <section>
                     <SectionHeader title="Fashion's Top Deals" href="/deals/fashion" />
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
