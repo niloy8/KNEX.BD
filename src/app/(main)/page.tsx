@@ -44,17 +44,17 @@ export default function HomePage() {
     ];
 
     const winterEssentials = [
-        { label: "Top Sellers", image: "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=400&q=80" },
-        { label: "Most-loved", image: "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=400&q=80" },
-        { label: "Min. 50% Off", image: "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=400&q=80" },
-        { label: "Top Picks", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&q=80" },
+        { label: "Top Sellers", meta: "Warm • Soft • Everyday", image: "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=400&q=80" },
+        { label: "Most-loved", meta: "Trending • Best Rated", image: "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=400&q=80" },
+        { label: "Min. 50% Off", meta: "Big Savings • Limited Time", image: "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=400&q=80" },
+        { label: "Top Picks", meta: "Editor's Choice • Cozy", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&q=80" },
     ];
 
     const topPicksSale = [
-        { label: "Min. 50% Off", image: "https://images.unsplash.com/photo-1542060748-10c28b62716f?w=400&q=80" },
-        { label: "Min. 30% Off", image: "https://images.unsplash.com/photo-1556228578-8fb722d5277a?w=400&q=80" },
-        { label: "Min. 50% Off", image: "https://images.unsplash.com/photo-1586201375761-83865001e31b?w=400&q=80" },
-        { label: "Min. 50% Off", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&q=80" },
+        { label: "Min. 50% Off", meta: "Hot Deals • Limited Stock", image: "https://images.unsplash.com/photo-1542060748-10c28b62716f?w=400&q=80" },
+        { label: "Min. 30% Off", meta: "Popular • Great Value", image: "https://images.unsplash.com/photo-1556228578-8fb722d5277a?w=400&q=80" },
+        { label: "Min. 50% Off", meta: "Must-Have • Seasonal", image: "https://images.unsplash.com/photo-1586201375761-83865001e31b?w=400&q=80" },
+        { label: "Min. 50% Off", meta: "Top Rated • Durable", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&q=80" },
     ];
 
     return (
