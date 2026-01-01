@@ -1,24 +1,38 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useRef, useEffect } from "react";
-import { ShoppingCart, Search, Heart, UserRound, Menu, X, Monitor, Footprints, Home, Shirt, Sparkles, Gamepad2 } from "lucide-react";
-import { allProducts } from "@/data/productsData";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { ShoppingCart, Search, Heart, UserRound, Menu, X, Monitor, Footprints, Home, Shirt, Sparkles, Gamepad2, Loader2 } from "lucide-react";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+interface SearchProduct {
+    id: string;
+    title: string;
+    slug: string;
+    price: number;
+    image: string;
+    brand: { name: string } | null;
+    category: { name: string; slug: string } | null;
+}
 
 export default function Header() {
     const [searchQuery, setSearchQuery] = useState("");
     const [menuOpen, setMenuOpen] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [suggestions, setSuggestions] = useState<SearchProduct[]>([]);
+    const [searchLoading, setSearchLoading] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
 
     const getCategoryIcon = (category: string) => {
         const icons: Record<string, React.ReactNode> = {
-            "gaming-monitor": <Monitor className="w-5 h-5 text-blue-600" />,
-            "sports-shoes": <Footprints className="w-5 h-5 text-green-600" />,
-            "home-lifestyle": <Home className="w-5 h-5 text-purple-600" />,
             "fashion": <Shirt className="w-5 h-5 text-pink-600" />,
-            "beauty-health": <Sparkles className="w-5 h-5 text-yellow-600" />,
-            "gaming": <Gamepad2 className="w-5 h-5 text-red-600" />,
+            "beauty": <Sparkles className="w-5 h-5 text-yellow-600" />,
+            "mobiles": <Monitor className="w-5 h-5 text-blue-600" />,
+            "smart-gadget": <Gamepad2 className="w-5 h-5 text-red-600" />,
+            "electronics": <Monitor className="w-5 h-5 text-blue-600" />,
+            "home-furniture": <Home className="w-5 h-5 text-purple-600" />,
+            "stone": <Sparkles className="w-5 h-5 text-gray-600" />,
         };
         return icons[category] || <Monitor className="w-5 h-5 text-gray-600" />;
     };
@@ -33,25 +47,35 @@ export default function Header() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const getSearchResults = () => {
-        if (!searchQuery.trim()) return { products: [], categories: [] };
+    const searchProducts = useCallback(async (query: string) => {
+        if (!query.trim()) {
+            setSuggestions([]);
+            return;
+        }
+        setSearchLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/products?search=${encodeURIComponent(query)}&limit=6`);
+            const data = await res.json();
+            setSuggestions(data.products || []);
+        } catch (error) {
+            console.error("Search error:", error);
+            setSuggestions([]);
+        } finally {
+            setSearchLoading(false);
+        }
+    }, []);
 
-        const query = searchQuery.toLowerCase();
-        const matchedProducts = allProducts
-            .filter(p => p.title.toLowerCase().includes(query) || p.brand.toLowerCase().includes(query))
-            .slice(0, 6);
-
-        const categories = Array.from(new Set(
-            allProducts
-                .filter(p => p.category.toLowerCase().includes(query))
-                .map(p => p.category)
-        )).slice(0, 2);
-
-        return { products: matchedProducts, categories };
-    };
-
-    const { products: suggestions, categories: categoryResults } = getSearchResults();
-    const totalResults = suggestions.length + categoryResults.length;
+    // Debounce search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchQuery.trim()) {
+                searchProducts(searchQuery);
+            } else {
+                setSuggestions([]);
+            }
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery, searchProducts]);
 
     const handleSearchChange = (value: string) => {
         setSearchQuery(value);
@@ -87,51 +111,42 @@ export default function Header() {
                         </button>
 
                         {/* Search Suggestions Dropdown */}
-                        {showSuggestions && totalResults > 0 && (
+                        {showSuggestions && (
                             <div className="absolute top-full mt-2 w-full bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-y-auto z-50">
-                                {/* Categories */}
-                                {categoryResults.length > 0 && (
-                                    <div className="p-2 border-b border-gray-100">
-                                        <p className="text-xs font-semibold text-gray-500 px-3 py-2">CATEGORIES</p>
-                                        {categoryResults.map((category, idx) => (
-                                            <Link
-                                                key={idx}
-                                                href={`/products?category=${category}`}
-                                                onClick={() => setShowSuggestions(false)}
-                                                className="flex items-center gap-3 px-3 py-2 hover:bg-blue-50 rounded-lg transition-colors"
-                                            >
-                                                <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                                                    {getCategoryIcon(category)}
-                                                </div>
-                                                <span className="text-sm font-medium text-gray-900 capitalize">{category.replace('-', ' ')}</span>
-                                            </Link>
-                                        ))}
+                                {searchLoading ? (
+                                    <div className="flex items-center justify-center py-8">
+                                        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
                                     </div>
-                                )}
-
-                                {/* Products */}
-                                {suggestions.length > 0 && (
+                                ) : suggestions.length > 0 ? (
                                     <div className="p-2">
                                         <p className="text-xs font-semibold text-gray-500 px-3 py-2">PRODUCTS</p>
                                         {suggestions.map((product) => (
                                             <Link
                                                 key={product.id}
-                                                href={product.href}
+                                                href={`/products/${product.slug || product.id}`}
                                                 onClick={() => setShowSuggestions(false)}
                                                 className="flex items-center gap-3 px-3 py-2 hover:bg-blue-50 rounded-lg transition-colors"
                                             >
-                                                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">
-                                                    {product.image}
+                                                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                                                    {product.image ? (
+                                                        <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-2xl">📦</span>
+                                                    )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-sm font-medium text-gray-900 line-clamp-1">{product.title}</p>
-                                                    <p className="text-xs text-gray-500">{product.brand}</p>
+                                                    <p className="text-xs text-gray-500">{product.brand?.name || product.category?.name || ""}</p>
                                                 </div>
                                                 <p className="text-sm font-bold text-blue-600">Tk {product.price.toLocaleString()}</p>
                                             </Link>
                                         ))}
                                     </div>
-                                )}
+                                ) : searchQuery.trim() ? (
+                                    <div className="p-8 text-center">
+                                        <p className="text-sm text-gray-500">No products found for &quot;{searchQuery}&quot;</p>
+                                    </div>
+                                ) : null}
                             </div>
                         )}
                     </div>

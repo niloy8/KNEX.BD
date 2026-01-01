@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft, Save, Eye, Loader2 } from "lucide-react";
@@ -26,16 +26,25 @@ interface Brand {
     name: string;
 }
 
-export default function AdminEditProduct() {
-    const params = useParams();
+export default function AdminNewProduct() {
     const router = useRouter();
-    const id = params.id as string;
-    const isNew = id === "new";
-
     const [mounted, setMounted] = useState(false);
-    const [product, setProduct] = useState<any>(null);
     const [saving, setSaving] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [product, setProduct] = useState<any>({
+        id: "",
+        title: "",
+        price: 0,
+        originalPrice: 0,
+        categoryId: "",
+        subCategoryId: "",
+        brandId: "",
+        features: [],
+        rating: 0,
+        totalReviews: 0,
+        sku: "",
+        inStock: true,
+        stockQuantity: 0,
+    });
     const [mainImage, setMainImage] = useState<string>("");
     const [gallery, setGallery] = useState<string[]>([]);
     const [colors, setColors] = useState<string[]>([]);
@@ -50,7 +59,6 @@ export default function AdminEditProduct() {
     const [tags, setTags] = useState<string[]>([]);
     const [variants, setVariants] = useState<{ name: string; values: string[]; prices?: { [key: string]: number } }[]>([]);
     
-    // Real data from API
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
 
@@ -79,82 +87,27 @@ export default function AdminEditProduct() {
         }
     }, []);
 
-    const fetchProduct = useCallback(async () => {
-        if (isNew) {
-            setProduct({
-                id: "",
-                title: "",
-                price: 0,
-                originalPrice: 0,
-                categoryId: "",
-                subCategoryId: "",
-                brandId: "",
-                features: [],
-                rating: 0,
-                totalReviews: 0,
-                sku: "",
-                inStock: true,
-                stockQuantity: 0,
-            });
-            setLoading(false);
-            return;
-        }
-
-        try {
-            const res = await fetch(`${API_URL}/products/${id}`);
-            if (!res.ok) throw new Error("Product not found");
-            const p = await res.json();
-
-            setProduct({
-                id: p.id,
-                title: p.title,
-                price: p.price,
-                originalPrice: p.originalPrice,
-                categoryId: p.categoryId || "",
-                subCategoryId: p.subCategoryId || "",
-                brandId: p.brandId || "",
-                features: p.features || [],
-                rating: p.rating,
-                totalReviews: p.totalReviews,
-                sku: p.sku || "",
-                inStock: p.inStock,
-                stockQuantity: p.stockQuantity,
-            });
-            setMainImage(p.image || "");
-            setGallery(p.gallery || []);
-            setColors(p.colors || []);
-            setSizes(p.sizes || []);
-            setFeatures(p.features || []);
-            setImageSwatch(p.imageSwatch || []);
-            setDisplayOptions(p.displayOptions || []);
-            setDescription(p.description || "");
-            setTags(p.tags || []);
-            setVariants(p.variants || []);
-            const hasVariants = p.colors || p.sizes || p.imageSwatch;
-            setProductType(hasVariants ? "variable" : "simple");
-            setSwatchType(p.imageSwatch?.length > 0 ? "image" : "color");
-        } catch (error) {
-            console.error("Error fetching product:", error);
-            router.push("/admin/products");
-        } finally {
-            setLoading(false);
-        }
-    }, [id, isNew, router]);
-
     useEffect(() => {
         if (!mounted) return;
         fetchCategories();
         fetchBrands();
-        fetchProduct();
-    }, [mounted, fetchCategories, fetchBrands, fetchProduct]);
+    }, [mounted, fetchCategories, fetchBrands]);
 
     const handleSave = async () => {
+        if (!product.title) {
+            alert("Please enter a product title");
+            return;
+        }
+        if (!product.price) {
+            alert("Please enter a product price");
+            return;
+        }
+
         setSaving(true);
 
         try {
             const token = localStorage.getItem("adminToken");
             
-            // Build product object with all data
             const productData = {
                 title: product.title,
                 price: Number(product.price),
@@ -178,11 +131,8 @@ export default function AdminEditProduct() {
                 }),
             };
 
-            const url = isNew ? `${API_URL}/products` : `${API_URL}/products/${id}`;
-            const method = isNew ? "POST" : "PUT";
-
-            const res = await fetch(url, {
-                method,
+            const res = await fetch(`${API_URL}/products`, {
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
@@ -192,20 +142,20 @@ export default function AdminEditProduct() {
 
             if (!res.ok) {
                 const error = await res.json();
-                throw new Error(error.message || "Failed to save product");
+                throw new Error(error.message || "Failed to create product");
             }
 
-            alert(isNew ? "Product created successfully!" : "Product updated successfully!");
+            alert("Product created successfully!");
             router.push("/admin/products");
         } catch (error: any) {
-            console.error("Error saving product:", error);
-            alert(error.message || "Error saving product");
+            console.error("Error creating product:", error);
+            alert(error.message || "Error creating product");
         } finally {
             setSaving(false);
         }
     };
 
-    if (!mounted || loading) {
+    if (!mounted) {
         return (
             <ProtectedAdmin>
                 <div className="flex items-center justify-center py-12">
@@ -214,8 +164,6 @@ export default function AdminEditProduct() {
             </ProtectedAdmin>
         );
     }
-
-    if (!product) return null;
 
     return (
         <ProtectedAdmin>
@@ -226,12 +174,8 @@ export default function AdminEditProduct() {
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">
-                            {id === "new" ? "Add New Product" : "Edit Product"}
-                        </h1>
-                        <p className="text-sm text-gray-500 mt-1">
-                            {id === "new" ? "Create a new product" : `Update product details`}
-                        </p>
+                        <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
+                        <p className="text-sm text-gray-500 mt-1">Create a new product in your catalog</p>
                     </div>
                 </div>
 
@@ -310,7 +254,7 @@ export default function AdminEditProduct() {
                             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
                         >
                             <Save className="w-4 h-4" />
-                            {saving ? "Saving..." : "Save Product"}
+                            {saving ? "Creating..." : "Create Product"}
                         </button>
                         <button
                             onClick={() => setShowPreview(!showPreview)}

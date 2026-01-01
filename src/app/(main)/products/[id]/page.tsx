@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import { useParams } from "next/navigation";
-import { allProducts } from "@/data/productsData";
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
     Star,
     Heart,
@@ -13,69 +13,124 @@ import {
     Minus,
     Plus,
     ChevronRight,
-    PlayCircle
+    PlayCircle,
+    Loader2,
+    Package
 } from "lucide-react";
-import CategoryCard from "@/components/CategoryCard";
 import CategoryNav from "@/components/CategoryNav";
 
-// Mock data for extended product details since the basic data is limited
-const extendedProductData = {
-    description: "Experience the ultimate performance with our latest product. Designed with precision and crafted for durability, this item stands out in both functionality and style. Whether you're a professional or an enthusiast, this product will exceed your expectations.",
-    longDescription: `
-    <p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-    <p class="mb-4">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    <ul class="list-disc pl-5 mb-4 space-y-2">
-      <li>High-quality materials for long-lasting durability</li>
-      <li>Ergonomic design for maximum comfort</li>
-      <li>Advanced technology for superior performance</li>
-      <li>Eco-friendly manufacturing process</li>
-    </ul>
-  `,
-    reviews: [
-        { id: 1, user: "John Doe", rating: 5, comment: "Absolutely amazing product! Worth every penny.", date: "2023-10-15" },
-        { id: 2, user: "Jane Smith", rating: 4, comment: "Great quality, but shipping took a bit longer than expected.", date: "2023-10-12" },
-    ],
-    gallery: [
-        "/placeholder-1.jpg", // Will replace with emoji or color blocks for demo
-        "/placeholder-2.jpg",
-        "/placeholder-3.jpg",
-        "/placeholder-4.jpg",
-    ],
-    colors: [
-        { name: "Blue", value: "#3b82f6" },
-        { name: "Green", value: "#22c55e" },
-        { name: "Yellow", value: "#eab308" },
-        { name: "Black", value: "#000000" },
-    ],
-    sizes: ["S", "M", "L", "XL"],
-};
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+interface Product {
+    id: string;
+    title: string;
+    slug: string;
+    price: number;
+    originalPrice: number;
+    discount: number;
+    rating: number;
+    totalRatings: number;
+    totalReviews: number;
+    image: string;
+    images: string[];
+    features: string[];
+    description: string;
+    inStock: boolean;
+    stockQuantity: number;
+    sku: string;
+    category: { id: string; name: string; slug: string } | null;
+    subCategory: { id: string; name: string; slug: string } | null;
+    brand: { id: string; name: string } | null;
+    colors?: string[];
+    sizes?: string[];
+}
+
+// Default values for options
+const defaultColors = [
+    { name: "Blue", value: "#3b82f6" },
+    { name: "Green", value: "#22c55e" },
+    { name: "Yellow", value: "#eab308" },
+    { name: "Black", value: "#000000" },
+];
+const defaultSizes = ["S", "M", "L", "XL"];
 
 export default function SingleProductPage() {
     const params = useParams();
+    const router = useRouter();
     const id = params.id as string;
-    const product = allProducts.find((p) => p.id === id) || allProducts[0]; // Fallback to first product if not found
+    
+    const [product, setProduct] = useState<Product | null>(null);
+    const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
 
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
-    const [selectedColor, setSelectedColor] = useState(extendedProductData.colors[0]);
-    const [selectedSize, setSelectedSize] = useState(extendedProductData.sizes[1]);
+    const [selectedColor, setSelectedColor] = useState(defaultColors[0]);
+    const [selectedSize, setSelectedSize] = useState(defaultSizes[1]);
     const [activeTab, setActiveTab] = useState("description");
 
-    // Mock gallery using the product emoji and some colored blocks to simulate images
-    const galleryImages = [
-        { type: "image", content: product.image, bg: "bg-gray-100" },
-        { type: "image", content: product.image, bg: "bg-blue-50" },
-        { type: "image", content: product.image, bg: "bg-green-50" },
-        { type: "video", content: "▶️", bg: "bg-gray-900 text-white" },
-    ];
+    const fetchProduct = useCallback(async () => {
+        try {
+            const res = await fetch(`${API_URL}/products/${id}`);
+            if (!res.ok) {
+                router.push("/products");
+                return;
+            }
+            const data = await res.json();
+            setProduct(data);
+            
+            // Fetch related products from same category
+            if (data.category?.slug) {
+                const relatedRes = await fetch(`${API_URL}/products?category=${data.category.slug}&limit=4`);
+                const relatedData = await relatedRes.json();
+                setRelatedProducts((relatedData.products || []).filter((p: Product) => p.id !== data.id));
+            }
+        } catch (error) {
+            console.error("Error fetching product:", error);
+            router.push("/products");
+        } finally {
+            setLoading(false);
+        }
+    }, [id, router]);
+
+    useEffect(() => {
+        fetchProduct();
+    }, [fetchProduct]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            </div>
+        );
+    }
+
+    if (!product) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <p className="text-gray-500">Product not found</p>
+            </div>
+        );
+    }
+
+    // Build gallery from product images
+    const galleryImages = product.images?.length > 0 
+        ? product.images.map(img => ({ type: "image" as const, content: img, bg: "bg-gray-100" }))
+        : product.image 
+            ? [
+                { type: "image" as const, content: product.image, bg: "bg-gray-100" },
+                { type: "image" as const, content: product.image, bg: "bg-blue-50" },
+                { type: "image" as const, content: product.image, bg: "bg-green-50" },
+            ]
+            : [{ type: "image" as const, content: "📦", bg: "bg-gray-100" }];
 
     const handleQuantityChange = (type: "inc" | "dec") => {
         if (type === "inc") setQuantity(prev => prev + 1);
         if (type === "dec" && quantity > 1) setQuantity(prev => prev - 1);
     };
 
-    // Calculate discount percentage if not provided
-    const discountPercentage = product.discount || Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+    const colors = product.colors?.length ? product.colors.map((c, i) => ({ name: c, value: defaultColors[i % defaultColors.length].value })) : defaultColors;
+    const sizes = product.sizes?.length ? product.sizes : defaultSizes;
 
     return (
         <div className="min-h-screen bg-gray-50 pb-12">
@@ -171,14 +226,14 @@ export default function SingleProductPage() {
                                             <Star key={i} className={`w-4 h-4 ${i < Math.floor(product.rating) ? "fill-current" : "text-gray-300"}`} />
                                         ))}
                                         <span className="ml-2 text-gray-600 font-medium">
-                                            {product.rating} ({product.totalReviews} reviews)
+                                            {product.rating.toFixed(1)} ({product.totalReviews} reviews)
                                         </span>
                                     </div>
                                     <span className="text-gray-300">|</span>
-                                    <span className="text-gray-500">SKU: <span className="text-gray-900 font-medium">KNEX-{product.id.padStart(4, '0')}</span></span>
+                                    <span className="text-gray-500">SKU: <span className="text-gray-900 font-medium">{product.sku || `KNEX-${product.id.slice(0, 8)}`}</span></span>
                                     <span className="text-gray-300">|</span>
-                                    <span className={`font-medium ${product.assured ? "text-green-600" : "text-red-500"}`}>
-                                        {product.assured ? "In Stock" : "Out of Stock"}
+                                    <span className={`font-medium ${product.inStock ? "text-green-600" : "text-red-500"}`}>
+                                        {product.inStock ? `In Stock (${product.stockQuantity})` : "Out of Stock"}
                                     </span>
                                 </div>
 
@@ -191,7 +246,7 @@ export default function SingleProductPage() {
                                 </div>
 
                                 <p className="text-gray-600 mb-6 leading-relaxed">
-                                    {extendedProductData.description}
+                                    {product.description || "Experience the ultimate quality with this product. Designed with precision and crafted for durability."}
                                 </p>
 
                                 <div className="h-px bg-gray-100 w-full mb-6"></div>
@@ -202,7 +257,7 @@ export default function SingleProductPage() {
                                     <div>
                                         <span className="block text-sm font-medium text-gray-900 mb-3">Color: <span className="text-gray-500 font-normal">{selectedColor.name}</span></span>
                                         <div className="flex flex-wrap gap-3">
-                                            {extendedProductData.colors.map((color) => (
+                                            {colors.map((color) => (
                                                 <button
                                                     key={color.name}
                                                     onClick={() => setSelectedColor(color)}
@@ -228,7 +283,7 @@ export default function SingleProductPage() {
                                             <button className="text-xs text-blue-600 hover:underline">Size Guide</button>
                                         </div>
                                         <div className="flex flex-wrap gap-3">
-                                            {extendedProductData.sizes.map((size) => (
+                                            {sizes.map((size) => (
                                                 <button
                                                     key={size}
                                                     onClick={() => setSelectedSize(size)}
@@ -344,41 +399,31 @@ export default function SingleProductPage() {
                         </div>
                         <div className="p-6 lg:p-10 bg-gray-50/50 min-h-[300px]">
                             {activeTab === "description" && (
-                                <div className="prose max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: extendedProductData.longDescription }} />
+                                <div className="prose max-w-none text-gray-600">
+                                    {product.description ? (
+                                        <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                                    ) : (
+                                        <p>No description available for this product.</p>
+                                    )}
+                                </div>
                             )}
                             {activeTab === "additional info" && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-3xl">
-                                    {product.features.map((feature, idx) => (
-                                        <div key={idx} className="flex border-b border-gray-200 py-3">
-                                            <span className="font-medium text-gray-900 w-1/2">{feature.split(':')[0]}</span>
-                                            <span className="text-gray-600 w-1/2">{feature.split(':')[1] || "Yes"}</span>
-                                        </div>
-                                    ))}
+                                    {product.features?.length > 0 ? (
+                                        product.features.map((feature, idx) => (
+                                            <div key={idx} className="flex border-b border-gray-200 py-3">
+                                                <span className="font-medium text-gray-900 w-1/2">{feature.split(':')[0]}</span>
+                                                <span className="text-gray-600 w-1/2">{feature.split(':')[1] || "Yes"}</span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-500">No additional information available.</p>
+                                    )}
                                 </div>
                             )}
                             {activeTab === "reviews" && (
                                 <div className="space-y-6 max-w-4xl">
-                                    {extendedProductData.reviews.map((review) => (
-                                        <div key={review.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                                                        {review.user.charAt(0)}
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="font-bold text-gray-900">{review.user}</h4>
-                                                        <div className="flex text-yellow-400 text-xs mt-1">
-                                                            {[...Array(5)].map((_, i) => (
-                                                                <Star key={i} className={`w-3 h-3 ${i < review.rating ? "fill-current" : "text-gray-300"}`} />
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <span className="text-xs text-gray-400">{review.date}</span>
-                                            </div>
-                                            <p className="text-gray-600">{review.comment}</p>
-                                        </div>
-                                    ))}
+                                    <p className="text-gray-500">No reviews yet. Be the first to review this product!</p>
                                     <button className="mt-4 text-blue-600 font-medium hover:underline">Write a Review</button>
                                 </div>
                             )}
@@ -387,26 +432,37 @@ export default function SingleProductPage() {
                 </div>
 
                 {/* Related Products */}
+                {relatedProducts.length > 0 && (
                 <div className="mt-16">
                     <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-2">
                         <span className="w-1 h-8 bg-blue-600 rounded-full block"></span>
                         Related Products
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {allProducts.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4).map((relatedProduct) => (
-                            <Link href={`/products/${relatedProduct.id}`} key={relatedProduct.id} className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
-                                <div className="aspect-[4/3] bg-gray-50 flex items-center justify-center text-5xl group-hover:scale-105 transition-transform duration-500">
-                                    {relatedProduct.image}
+                        {relatedProducts.slice(0, 4).map((relatedProduct) => (
+                            <Link href={`/products/${relatedProduct.slug || relatedProduct.id}`} key={relatedProduct.id} className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
+                                <div className="aspect-[4/3] bg-gray-50 flex items-center justify-center overflow-hidden">
+                                    {relatedProduct.images?.[0] ? (
+                                        <Image 
+                                            src={relatedProduct.images[0]} 
+                                            alt={relatedProduct.title} 
+                                            width={200} 
+                                            height={150}
+                                            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                                        />
+                                    ) : (
+                                        <Package className="w-12 h-12 text-gray-300" />
+                                    )}
                                 </div>
                                 <div className="p-4">
                                     <h3 className="font-medium text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                                         {relatedProduct.title}
                                     </h3>
                                     <div className="flex items-center justify-between">
-                                        <span className="font-bold text-blue-600">Tk {relatedProduct.price.toLocaleString()}</span>
+                                        <span className="font-bold text-blue-600">Tk {relatedProduct.price?.toLocaleString() || 0}</span>
                                         <div className="flex items-center text-yellow-400 text-xs">
                                             <Star className="w-3 h-3 fill-current" />
-                                            <span className="ml-1 text-gray-500">{relatedProduct.rating}</span>
+                                            <span className="ml-1 text-gray-500">{relatedProduct.rating || 0}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -414,7 +470,7 @@ export default function SingleProductPage() {
                         ))}
                     </div>
                 </div>
-            </div>
+                )}
         </div>
     );
 }

@@ -1,11 +1,11 @@
-import { X, ChevronRight } from "lucide-react";
-import Link from "next/link";
+import { X } from "lucide-react";
 import { filters } from "@/data/productsData";
 
 interface DesktopFiltersProps {
     selectedBrands: string[];
     selectedPriceRange: number[];
     categoryParam: string | null;
+    dynamicBrands?: string[];
     onToggleBrand: (brand: string) => void;
     onTogglePriceRange: (index: number) => void;
     onClearAll: () => void;
@@ -14,11 +14,13 @@ interface DesktopFiltersProps {
 export default function DesktopFilters({
     selectedBrands,
     selectedPriceRange,
-    categoryParam,
+    dynamicBrands,
     onToggleBrand,
     onTogglePriceRange,
     onClearAll,
 }: DesktopFiltersProps) {
+    const brandsToShow = dynamicBrands && dynamicBrands.length > 0 ? dynamicBrands : filters.brands;
+
     return (
         <aside className="hidden lg:block w-64 flex-shrink-0">
             <div className="bg-white rounded-lg p-4 sticky top-20">
@@ -46,31 +48,19 @@ export default function DesktopFilters({
                     </div>
                 )}
 
-                <div className="mb-6">
-                    <h3 className="font-semibold mb-3">Categories</h3>
-                    <div className="space-y-2">
-                        {filters.categories.map((category) => (
-                            <Link key={category.id} href={`/products?category=${category.id}`} className={`block px-3 py-2 rounded cursor-pointer hover:bg-gray-100 ${categoryParam === category.id ? "bg-blue-50 text-blue-600" : ""}`}>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm">{category.name}</span>
-                                    <ChevronRight size={16} />
-                                </div>
-                            </Link>
-                        ))}
+                {brandsToShow.length > 0 && (
+                    <div className="mb-6">
+                        <h3 className="font-semibold mb-3">Brand</h3>
+                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                            {brandsToShow.map((brand) => (
+                                <label key={brand} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                                    <input type="checkbox" checked={selectedBrands.includes(brand)} onChange={() => onToggleBrand(brand)} className="w-4 h-4 cursor-pointer" />
+                                    <span className="text-sm">{brand}</span>
+                                </label>
+                            ))}
+                        </div>
                     </div>
-                </div>
-
-                <div className="mb-6">
-                    <h3 className="font-semibold mb-3">Brand</h3>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                        {filters.brands.map((brand) => (
-                            <label key={brand} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
-                                <input type="checkbox" checked={selectedBrands.includes(brand)} onChange={() => onToggleBrand(brand)} className="w-4 h-4 cursor-pointer" />
-                                <span className="text-sm">{brand}</span>
-                            </label>
-                        ))}
-                    </div>
-                </div>
+                )}
 
                 <div>
                     <h3 className="font-semibold mb-3">Price Range</h3>

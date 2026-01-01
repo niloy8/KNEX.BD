@@ -1,36 +1,58 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ProtectedAdmin from "@/components/admin/ProtectAdmin";
 import StatCard from "@/components/admin/StatCard";
-import SimpleChart from "@/components/admin/SimpleChart";
-import ProgressRing from "@/components/admin/ProgressRing";
-import DataTable from "@/components/admin/DataTable";
-import Badge from "@/components/admin/Badge";
-import {
-    analyticsData,
-    revenueChartData,
-    adminData
-} from "@/lib/adminData";
-import { Banknote, ShoppingBag, Users, TrendingUp, MoreVertical } from "lucide-react";
+import { Banknote, ShoppingBag, Users, TrendingUp, Package } from "lucide-react";
 import Link from "next/link";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+interface Category {
+    id: string;
+    name: string;
+    _count?: { products: number };
+}
 
 export default function AdminDashboard() {
     const [dateFilter, setDateFilter] = useState("Last 7 days");
-    const orders = adminData.getOrders();
-    const activities = adminData.getActivities();
-    const topCategories = analyticsData.topCategories;
-    const trafficSources = analyticsData.trafficSources;
+    const [stats, setStats] = useState({
+        totalProducts: 0,
+        totalCategories: 0,
+        totalBrands: 0,
+    });
+    const [topCategories, setTopCategories] = useState<Category[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const getStatusBadge = (status: string) => {
-        const variants: Record<string, "success" | "warning" | "error" | "info"> = {
-            Delivered: "success",
-            Processing: "info",
-            Pending: "warning",
-            Cancelled: "error",
-        };
-        return <Badge variant={variants[status] || "default"}>{status}</Badge>;
-    };
+    const fetchDashboardData = useCallback(async () => {
+        try {
+            const [productsRes, categoriesRes, brandsRes] = await Promise.all([
+                fetch(`${API_URL}/products?limit=1`),
+                fetch(`${API_URL}/categories`),
+                fetch(`${API_URL}/brands`),
+            ]);
+
+            const productsData = await productsRes.json();
+            const categoriesData = await categoriesRes.json();
+            const brandsData = await brandsRes.json();
+
+            setStats({
+                totalProducts: productsData.total || 0,
+                totalCategories: categoriesData?.length || 0,
+                totalBrands: brandsData?.length || 0,
+            });
+
+            setTopCategories(categoriesData?.slice(0, 4) || []);
+        } catch (error) {
+            console.error("Error fetching dashboard data:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchDashboardData();
+    }, [fetchDashboardData]);
 
     return (
         <ProtectedAdmin>
@@ -39,7 +61,7 @@ export default function AdminDashboard() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                        <p className="text-sm text-gray-500 mt-1">Welcome back! Here is what happening today.</p>
+                        <p className="text-sm text-gray-500 mt-1">Welcome back! Here is your store overview.</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <select
@@ -57,167 +79,126 @@ export default function AdminDashboard() {
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <StatCard
-                        title="Total Revenue"
-                        value={`Tk ${analyticsData.totalRevenue.toLocaleString()}`}
-                        change={analyticsData.revenueChange}
+                        title="Total Products"
+                        value={loading ? "..." : stats.totalProducts.toLocaleString()}
+                        change="+0%"
                         trend="up"
-                        icon={<Banknote className="w-6 h-6 text-blue-600" />}
+                        icon={<Package className="w-6 h-6 text-blue-600" />}
                     />
                     <StatCard
-                        title="Total Sales"
-                        value={analyticsData.totalSales.toLocaleString()}
-                        change={analyticsData.salesChange}
+                        title="Categories"
+                        value={loading ? "..." : stats.totalCategories.toLocaleString()}
+                        change="+0%"
                         trend="up"
                         icon={<ShoppingBag className="w-6 h-6 text-green-600" />}
                     />
                     <StatCard
-                        title="Total Visitors"
-                        value={analyticsData.totalVisitors.toLocaleString()}
-                        change={analyticsData.visitorsChange}
+                        title="Brands"
+                        value={loading ? "..." : stats.totalBrands.toLocaleString()}
+                        change="+0%"
                         trend="up"
                         icon={<Users className="w-6 h-6 text-purple-600" />}
                     />
                     <StatCard
-                        title="Conversion Rate"
-                        value="3.2%"
-                        change="+0.4%"
+                        title="Revenue"
+                        value="Tk 0"
+                        change="+0%"
                         trend="up"
-                        icon={<TrendingUp className="w-6 h-6 text-yellow-600" />}
+                        icon={<Banknote className="w-6 h-6 text-yellow-600" />}
                     />
                 </div>
 
-                {/* Charts Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Revenue Analytics */}
-                    <div className="lg:col-span-2 bg-white rounded-lg border border-gray-100 p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900">Revenue Analytics</h3>
-                                <p className="text-sm text-gray-500">{dateFilter} performance</p>
-                            </div>
-                            <span className="px-3 py-1.5 text-sm text-blue-600 bg-blue-50 rounded-lg">
-                                {dateFilter}
-                            </span>
+                {/* Quick Actions */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Quick Links */}
+                    <div className="bg-white rounded-lg border border-gray-100 p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <Link
+                                href="/admin/products/new"
+                                className="p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-200 transition-colors text-center"
+                            >
+                                <Package className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                                <span className="text-sm font-medium text-gray-700">Add Product</span>
+                            </Link>
+                            <Link
+                                href="/admin/products"
+                                className="p-4 border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-200 transition-colors text-center"
+                            >
+                                <ShoppingBag className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                                <span className="text-sm font-medium text-gray-700">View Products</span>
+                            </Link>
+                            <Link
+                                href="/admin/orders"
+                                className="p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-200 transition-colors text-center"
+                            >
+                                <TrendingUp className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                                <span className="text-sm font-medium text-gray-700">View Orders</span>
+                            </Link>
+                            <Link
+                                href="/admin/customers"
+                                className="p-4 border border-gray-200 rounded-lg hover:bg-yellow-50 hover:border-yellow-200 transition-colors text-center"
+                            >
+                                <Users className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
+                                <span className="text-sm font-medium text-gray-700">Customers</span>
+                            </Link>
                         </div>
-                        <SimpleChart data={revenueChartData} color="#3b82f6" />
                     </div>
 
-                    {/* Monthly Target */}
+                    {/* Categories Overview */}
                     <div className="bg-white rounded-lg border border-gray-100 p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900">Monthly Target</h3>
-                            <button className="p-1 hover:bg-gray-100 rounded">
-                                <MoreVertical className="w-5 h-5 text-gray-400" />
-                            </button>
+                            <h3 className="text-lg font-semibold text-gray-900">Categories</h3>
+                            <Link href="/admin/products" className="text-sm text-blue-600 hover:text-blue-700">See All</Link>
                         </div>
-                        <div className="flex flex-col items-center">
-                            <ProgressRing percentage={analyticsData.targetAchieved} />
-                            <div className="mt-4 text-center">
-                                <p className="text-sm text-gray-500">Goal Target: 100%</p>
-                                <p className="text-xs text-gray-400 mt-1">
-                                    Total Targeted: Tk {analyticsData.monthlyTarget.toLocaleString()}
-                                </p>
-                                <p className="text-xs text-green-600 font-medium mt-1">
-                                    On track to hit target 🎯
-                                </p>
+                        {topCategories.length === 0 ? (
+                            <div className="text-center py-8">
+                                <p className="text-gray-500">No categories yet</p>
+                                <p className="text-sm text-gray-400 mt-1">Run the seed script to add categories</p>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Bottom Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Recent Orders */}
-                    <div className="lg:col-span-2">
-                        <div className="bg-white rounded-lg border border-gray-100">
-                            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                                <h3 className="text-lg font-semibold text-gray-900">Recent Orders</h3>
-                                <Link href="/admin/orders" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                                    View All →
-                                </Link>
-                            </div>
-                            <DataTable
-                                headers={["Order ID", "Customer", "Product", "Qty", "Total", "Status"]}
-                                data={orders.slice(0, 5)}
-                                renderRow={(order) => (
-                                    <tr key={order.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{order.orderId}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-700">{order.customer}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-700 flex items-center gap-2">
-                                            <span className="text-2xl">{order.productImage}</span>
-                                            <span className="hidden sm:inline">{order.product}</span>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-700">{order.quantity}</td>
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">Tk {order.total}</td>
-                                        <td className="px-6 py-4">{getStatusBadge(order.status)}</td>
-                                    </tr>
-                                )}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Right Column */}
-                    <div className="space-y-6">
-                        {/* Top Categories */}
-                        <div className="bg-white rounded-lg border border-gray-100 p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900">Top Categories</h3>
-                                <Link href="#" className="text-sm text-blue-600 hover:text-blue-700">See All</Link>
-                            </div>
+                        ) : (
                             <div className="space-y-4">
                                 {topCategories.map((cat, i) => {
                                     const colors = ["bg-blue-500", "bg-green-500", "bg-yellow-500", "bg-purple-500"];
                                     return (
-                                        <div key={i}>
+                                        <div key={cat.id}>
                                             <div className="flex items-center justify-between text-sm mb-2">
                                                 <span className="text-gray-700">{cat.name}</span>
-                                                <span className="font-medium text-gray-900">Tk {(cat.value / 1000).toFixed(0)}K</span>
+                                                <span className="font-medium text-gray-900">{cat._count?.products || 0} products</span>
                                             </div>
                                             <div className="w-full bg-gray-100 rounded-full h-2">
                                                 <div
                                                     className={`${colors[i % colors.length]} h-2 rounded-full transition-all duration-500`}
-                                                    style={{ width: `${(cat.value / topCategories[0].value) * 100}%` }}
+                                                    style={{ width: `${Math.min(100, (cat._count?.products || 0) * 10)}%` }}
                                                 />
                                             </div>
                                         </div>
                                     );
                                 })}
                             </div>
-                        </div>
+                        )}
+                    </div>
+                </div>
 
-                        {/* Traffic Sources */}
-                        <div className="bg-white rounded-lg border border-gray-100 p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Traffic Sources</h3>
-                            <div className="space-y-3">
-                                {trafficSources.map((source, i) => (
-                                    <div key={i} className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3 flex-1">
-                                            <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                                            <span className="text-sm text-gray-700">{source.source}</span>
-                                        </div>
-                                        <span className="text-sm font-medium text-gray-900">{source.percentage}%</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Recent Activity */}
-                        <div className="bg-white rounded-lg border border-gray-100 p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-                            <div className="space-y-4">
-                                {activities.map((activity) => (
-                                    <div key={activity.id} className="flex gap-3">
-                                        <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <span>{activity.icon}</span>
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="text-sm text-gray-700">{activity.message}</p>
-                                            <p className="text-xs text-gray-400 mt-0.5">{activity.time} ago</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                {/* Getting Started */}
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+                    <h3 className="text-lg font-semibold mb-2">Getting Started</h3>
+                    <p className="text-blue-100 text-sm mb-4">
+                        Your store is ready! Start by adding products to your catalog.
+                    </p>
+                    <div className="flex gap-3">
+                        <Link
+                            href="/admin/products/new"
+                            className="px-4 py-2 bg-white text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50 transition-colors"
+                        >
+                            Add First Product
+                        </Link>
+                        <Link
+                            href="/admin/products"
+                            className="px-4 py-2 bg-blue-400 text-white rounded-lg text-sm font-medium hover:bg-blue-300 transition-colors"
+                        >
+                            View Products
+                        </Link>
                     </div>
                 </div>
             </div>

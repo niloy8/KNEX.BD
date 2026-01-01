@@ -1,45 +1,17 @@
-import { useState, useMemo } from "react";
-import { allProducts, filters } from "@/data/productsData";
+import { useState } from "react";
+import { filters } from "@/data/productsData";
 
-export function useProductFilters(categoryParam: string | null) {
+/**
+ * Hook for managing product filter state
+ * Note: This hook is deprecated. The products page now uses API-based filtering directly.
+ * Keeping for backwards compatibility with any components that might use it.
+ */
+export function useProductFilters() {
     const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
     const [selectedPriceRange, setSelectedPriceRange] = useState<number[]>([]);
     const [sortBy, setSortBy] = useState("popularity");
     const [tempBrands, setTempBrands] = useState<string[]>([]);
     const [tempPriceRange, setTempPriceRange] = useState<number[]>([]);
-
-    const filteredProducts = useMemo(() => {
-        let filtered = [...allProducts];
-
-        if (categoryParam) {
-            filtered = filtered.filter(p => p.category === categoryParam);
-        }
-
-        if (selectedBrands.length > 0) {
-            filtered = filtered.filter(p => selectedBrands.includes(p.brand));
-        }
-
-        if (selectedPriceRange.length > 0) {
-            filtered = filtered.filter(p => {
-                const range = filters.priceRanges[selectedPriceRange[0]];
-                return p.price >= range.min && p.price <= range.max;
-            });
-        }
-
-        switch (sortBy) {
-            case "price -- low to high":
-                filtered.sort((a, b) => a.price - b.price);
-                break;
-            case "price -- high to low":
-                filtered.sort((a, b) => b.price - a.price);
-                break;
-            case "newest first":
-                filtered.reverse();
-                break;
-        }
-
-        return filtered;
-    }, [categoryParam, selectedBrands, selectedPriceRange, sortBy]);
 
     const toggleBrand = (brand: string, isMobile = false) => {
         if (isMobile) {
@@ -85,7 +57,7 @@ export function useProductFilters(categoryParam: string | null) {
         tempBrands,
         tempPriceRange,
         sortBy,
-        filteredProducts,
+        priceRanges: filters.priceRanges,
         setSortBy,
         toggleBrand,
         togglePriceRange,
