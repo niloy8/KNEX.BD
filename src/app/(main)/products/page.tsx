@@ -35,12 +35,12 @@ export default function ProductsPage() {
     const searchParams = useSearchParams();
     const categoryParam = searchParams.get("category");
     const subcategoryParam = searchParams.get("subcategory");
-    
+
     const [products, setProducts] = useState<Product[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
     const [totalProducts, setTotalProducts] = useState(0);
     const [loading, setLoading] = useState(true);
-    
+
     const [viewMode, setViewMode] = useState<"list" | "grid">("list");
     const [showFilters, setShowFilters] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -49,7 +49,7 @@ export default function ProductsPage() {
     const [selectedPriceRange, setSelectedPriceRange] = useState<number[]>([]);
     const [tempBrands, setTempBrands] = useState<string[]>([]);
     const [tempPriceRange, setTempPriceRange] = useState<number[]>([]);
-    
+
     const itemsPerPage = 12;
 
     const fetchProducts = useCallback(async () => {
@@ -76,7 +76,7 @@ export default function ProductsPage() {
         const params = new URLSearchParams();
         if (categoryParam) params.set("category", categoryParam);
         if (subcategoryParam) params.set("subcategory", subcategoryParam);
-        
+
         try {
             const res = await fetch(`${API}/products/brands?${params}`);
             setBrands(await res.json());

@@ -9,4 +9,3 @@ export const filters = {
         { label: "Above Tk 10,000", min: 10000, max: 999999 },
     ],
 };
-

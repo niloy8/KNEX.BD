@@ -52,12 +52,12 @@ interface ProductFormFieldsProps {
     onBrandsChange?: () => void;
 }
 
-export default function ProductFormFields({ 
-    product, 
-    setProduct, 
-    description, 
-    setDescription, 
-    tags, 
+export default function ProductFormFields({
+    product,
+    setProduct,
+    description,
+    setDescription,
+    tags,
     setTags,
     categories = [],
     brands = [],

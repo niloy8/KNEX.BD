@@ -58,7 +58,7 @@ export default function SingleProductPage() {
     const params = useParams();
     const router = useRouter();
     const id = params.id as string;
-    
+
     const [product, setProduct] = useState<Product | null>(null);
     const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
@@ -78,7 +78,7 @@ export default function SingleProductPage() {
             }
             const data = await res.json();
             setProduct(data);
-            
+
             // Fetch related products from same category
             if (data.category?.slug) {
                 const relatedRes = await fetch(`${API_URL}/products?category=${data.category.slug}&limit=4`);
@@ -114,9 +114,9 @@ export default function SingleProductPage() {
     }
 
     // Build gallery from product images
-    const galleryImages = product.images?.length > 0 
+    const galleryImages = product.images?.length > 0
         ? product.images.map(img => ({ type: "image" as const, content: img, bg: "bg-gray-100" }))
-        : product.image 
+        : product.image
             ? [
                 { type: "image" as const, content: product.image, bg: "bg-gray-100" },
                 { type: "image" as const, content: product.image, bg: "bg-blue-50" },
@@ -433,44 +433,44 @@ export default function SingleProductPage() {
 
                 {/* Related Products */}
                 {relatedProducts.length > 0 && (
-                <div className="mt-16">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-2">
-                        <span className="w-1 h-8 bg-blue-600 rounded-full block"></span>
-                        Related Products
-                    </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {relatedProducts.slice(0, 4).map((relatedProduct) => (
-                            <Link href={`/products/${relatedProduct.slug || relatedProduct.id}`} key={relatedProduct.id} className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
-                                <div className="aspect-[4/3] bg-gray-50 flex items-center justify-center overflow-hidden">
-                                    {relatedProduct.images?.[0] ? (
-                                        <Image 
-                                            src={relatedProduct.images[0]} 
-                                            alt={relatedProduct.title} 
-                                            width={200} 
-                                            height={150}
-                                            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                    ) : (
-                                        <Package className="w-12 h-12 text-gray-300" />
-                                    )}
-                                </div>
-                                <div className="p-4">
-                                    <h3 className="font-medium text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                                        {relatedProduct.title}
-                                    </h3>
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-bold text-blue-600">Tk {relatedProduct.price?.toLocaleString() || 0}</span>
-                                        <div className="flex items-center text-yellow-400 text-xs">
-                                            <Star className="w-3 h-3 fill-current" />
-                                            <span className="ml-1 text-gray-500">{relatedProduct.rating || 0}</span>
+                    <div className="mt-16">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-2">
+                            <span className="w-1 h-8 bg-blue-600 rounded-full block"></span>
+                            Related Products
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {relatedProducts.slice(0, 4).map((relatedProduct) => (
+                                <Link href={`/products/${relatedProduct.slug || relatedProduct.id}`} key={relatedProduct.id} className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
+                                    <div className="aspect-[4/3] bg-gray-50 flex items-center justify-center overflow-hidden">
+                                        {relatedProduct.images?.[0] ? (
+                                            <Image
+                                                src={relatedProduct.images[0]}
+                                                alt={relatedProduct.title}
+                                                width={200}
+                                                height={150}
+                                                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                        ) : (
+                                            <Package className="w-12 h-12 text-gray-300" />
+                                        )}
+                                    </div>
+                                    <div className="p-4">
+                                        <h3 className="font-medium text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                                            {relatedProduct.title}
+                                        </h3>
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-bold text-blue-600">Tk {relatedProduct.price?.toLocaleString() || 0}</span>
+                                            <div className="flex items-center text-yellow-400 text-xs">
+                                                <Star className="w-3 h-3 fill-current" />
+                                                <span className="ml-1 text-gray-500">{relatedProduct.rating || 0}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </Link>
-                        ))}
+                                </Link>
+                            ))}
+                        </div>
                     </div>
-                </div>
                 )}
-        </div>
-    );
+            </div>
+            );
 }

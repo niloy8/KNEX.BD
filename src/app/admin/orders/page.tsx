@@ -49,7 +49,7 @@ export default function AdminOrders() {
                         <ShoppingCart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                         <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
                         <p className="text-sm text-gray-500 max-w-sm mx-auto">
-                            Orders will appear here once customers start placing them. 
+                            Orders will appear here once customers start placing them.
                             The orders system will be implemented when the checkout feature is ready.
                         </p>
                     </div>
@@ -58,4 +58,4 @@ export default function AdminOrders() {
         </ProtectedAdmin>
     );
 }
-                            </tr>
+                            </tr >

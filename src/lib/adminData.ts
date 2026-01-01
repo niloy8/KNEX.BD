@@ -40,17 +40,17 @@ export const adminData = {
         // TODO: Implement when orders API is available
         return [];
     },
-    
+
     getCustomers: async (): Promise<Customer[]> => {
         // TODO: Implement when customers API is available
         return [];
     },
-    
+
     getActivities: async (): Promise<Activity[]> => {
         // TODO: Implement when activities API is available
         return [];
     },
-    
+
     getProducts: async () => {
         try {
             const res = await fetch(`${API_URL}/products`);
@@ -97,4 +97,3 @@ export const analyticsData = {
 
 // Revenue chart data - empty until real data is available
 export const revenueChartData = [] as { day: string; revenue: number }[];
-

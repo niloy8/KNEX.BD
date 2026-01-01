@@ -49,7 +49,7 @@ export default function AdminEditProduct() {
     const [description, setDescription] = useState<string>("");
     const [tags, setTags] = useState<string[]>([]);
     const [variants, setVariants] = useState<{ name: string; values: string[]; prices?: { [key: string]: number } }[]>([]);
-    
+
     // Real data from API
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
@@ -153,7 +153,7 @@ export default function AdminEditProduct() {
 
         try {
             const token = localStorage.getItem("adminToken");
-            
+
             // Build product object with all data
             const productData = {
                 title: product.title,

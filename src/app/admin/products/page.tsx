@@ -261,11 +261,10 @@ export default function AdminProducts() {
                             <button
                                 key={page}
                                 onClick={() => setCurrentPage(page)}
-                                className={`px-3 py-1.5 rounded-lg text-sm ${
-                                    currentPage === page
+                                className={`px-3 py-1.5 rounded-lg text-sm ${currentPage === page
                                         ? "bg-blue-600 text-white"
                                         : "border border-gray-200 hover:bg-gray-50"
-                                }`}
+                                    }`}
                             >
                                 {page}
                             </button>

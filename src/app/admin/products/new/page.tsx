@@ -58,7 +58,7 @@ export default function AdminNewProduct() {
     const [description, setDescription] = useState<string>("");
     const [tags, setTags] = useState<string[]>([]);
     const [variants, setVariants] = useState<{ name: string; values: string[]; prices?: { [key: string]: number } }[]>([]);
-    
+
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
 
@@ -107,7 +107,7 @@ export default function AdminNewProduct() {
 
         try {
             const token = localStorage.getItem("adminToken");
-            
+
             const productData = {
                 title: product.title,
                 price: Number(product.price),
